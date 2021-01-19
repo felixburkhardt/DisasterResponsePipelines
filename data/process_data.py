@@ -3,7 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
-
+'''Kommentare einfügen'''
     # load messages dataset
     messages = pd.read_csv("messages.csv")
     messages.head()
