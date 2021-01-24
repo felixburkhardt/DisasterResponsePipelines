@@ -3,19 +3,39 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
-'''Kommentare einfügen'''
+    '''
+    Load messages and categories and merge datasets on id
+    
+    Args:
+    messages_filepath: string. Filepath for messages dataset.
+    categories_filepath: string. Filepath for categories dataset.
+       
+    Retruns:
+    df: dataframe. Merged dataframe containing content of messages and categories datasets
+    '''
     # load messages dataset
-    messages = pd.read_csv("messages.csv")
-    messages.head()
+    messages = pd.read_csv(messages_filepath)
 
     # load categories dataset
-    categories = pd.read_csv("categories.csv")
-    categories.head()
+    categories = pd.read_csv(categories_filepath)
     
     # merge datasets
     df = pd.merge(messages, categories, on="id")
+    
+    return df
 
 def clean_data(df):
+    
+    '''
+    Clean dataframe
+    
+    Args:
+    df: dataframe. Merged df containing messages and categories df.
+       
+    Returns:
+    df: dataframe. Cleaned df.
+    '''
+    
     # create a dataframe of the 36 individual category columns
     categories = pd.DataFrame(df.categories.str.split(';',expand=True))
     
@@ -48,10 +68,20 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    '''Save df into  SQLite database.
     
-    engine = create_engine('sqlite:///InsertDatabaseName.db')
-    df.to_sql('InsertTableName', engine, index=False)
-
+    Args:
+    df: dataframe. Cleanded df containing cleaned version of merged message and 
+    categories data
+    
+    database_filename: string. Filename for output database
+       
+    Returns:
+    None
+    '''
+    engine = create_engine('sqlite:///' + database_filename)
+    df.to_sql('Messages', engine, index=False)
+    
 
 def main():
     if len(sys.argv) == 4:
