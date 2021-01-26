@@ -26,11 +26,16 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
+
+df = pd.read_sql_table('Messages1', engine)
+
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+
+model = joblib.load("../models/classifier.pkl")
+
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -45,7 +50,62 @@ def index():
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
+    
+    genre_percentage = round(100*genre_counts/genre_counts.sum(), 0)
+    genre = list(genre_counts.index)
+    
+    categories_num = df.drop(['id', 'message', 'original', 'genre'], axis = 1).sum()
+    categories_num = categories_num.sort_values(ascending = False)
+    categories = list(categories_num.index)
+    
+    cat_proportion = df.drop(['id', 'message', 'original', 'genre'], axis = 1).sum()/len(df)        
+    cat_proportion = cat_proportion.sort_values(ascending = False)
+
     graphs = [
+        # Pie Chart showing the percentage of messages by genre
+        
+        {
+            "data": [
+              {
+                "type": "pie",
+                "hole": 0.1,
+                "name": "Genre",
+                "domain": {
+                  "x": genre_percentage,
+                  "y": genre
+                },
+                
+                "textinfo": "label+value",
+                "labels": genre,
+                "values": genre_percentage
+              }
+            ],
+            "layout": {
+              "title": "Percentage of Messages by Genre"
+            }
+        },
+        
+        {
+            'data': [
+                {
+                "type": "pie",
+                #"hole": 0,
+                "name": "Genre",
+                "domain": {
+                  "x": categories,
+                  "y": cat_proportion
+                },
+                
+                "labels": categories,
+                "values": cat_proportion
+              }
+            ],
+
+             "layout": {
+             "title": "Proportion of Messages by Category"
+            }
+        },
+        
         {
             'data': [
                 Bar(
